@@ -17,15 +17,22 @@
 				RCurled: '}'
 			};
 			$(document).ready(function() {
-				$("#regex-source").on("change keyup paste", function() {
-					expression = $(this).val();
-					expressionIndex = 0;
-					expressionExplanation = "";
+				if($("#regex-source").text().length > 0) {
+					reset();
 					recurseExpression();
-					
+					$("#regex-description").html(expressionExplanation);
+				}
+				$("#regex-source").on("change keyup paste", function() {
+					reset();
+					recurseExpression();
 					$("#regex-description").html(expressionExplanation);
 				});
 			});
+			function reset() {
+				expression = $("#regex-source").val();
+				expressionIndex = 0;
+				expressionExplanation = "";
+			}
 			var expression;
 			var expressionIndex;
 			var expressionExplanation;
