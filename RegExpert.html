@@ -82,6 +82,7 @@
 						wasChar = false;
 					}
 					else if(accept(symbol.QuestionMark)) {
+					//future - lookahead for negative lookbehind assertion
 						expressionExplanation += ' 0 or 1 times ';
 						wasChar = false;
 					}
@@ -101,6 +102,17 @@
 						addCurrentSymbol();
 					}
 				}
+				while(nextSymbol()) {
+					if(accept('g')) {
+						expressionExplanation += ' globally ';
+					}
+				}
+			}
+			function lookahead(expectedSymbol) {
+				if(expressionIndex < expression.length && expression[expressionIndex] == expectedSymbol) {
+					return 1;
+				}
+				return 0;
 			}
 			function addCurrentSymbol() {
 				if(wasChar) {
