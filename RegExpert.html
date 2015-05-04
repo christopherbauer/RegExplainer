@@ -31,7 +31,9 @@
 			});
 			function execHighlighter() {
 				var lines = $("#regex-highlighter-example").val().split('\n');
-				var regexp = new RegExp($("#regex-source").val());
+				var regexMinusOptions = $("#regex-source").val();
+				regexMinusOptions = regexMinusOptions.substring(regexMinusOptions.indexOf('/')+1);
+				regexMinusOptions = regexMinusOptions.substring(0,regexMinusOptions.lastIndexOf('/'));
 				var highlights = [];
 				for(var i = 0; i < lines.length; i++) {
 					highlights[i] = {};
