@@ -56,7 +56,6 @@
 						addCurrentSymbol();
 					}
 					else if(accept(symbol.BackSlash)) {
-						wasChar = false;
 						if(escaping === true) {
 							escaping = false;
 							addCurrentSymbol();
@@ -145,13 +144,13 @@
 				expressionExplanation += '<span class="logicalGroup">(Logical Group: ';
 			}
 			function endSubExpression(symbol) {
-				expressionExplanation += ': End Group)</span>';
+				expressionExplanation += ')</span>';
 			}
 			function startCharClass() {
 				expressionExplanation += '<span class="charSet">[Char Set: ';
 			}
 			function endCharClass() {
-				expressionExplanation += ' : End Set]</span>';
+				expressionExplanation += ']</span>';
 			}
 			function SymbolNotExpectedException(expected) {
 				throw new Error("Expected '" + expected + "' but found '" + currentSymbol + "'");
