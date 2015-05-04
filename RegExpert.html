@@ -18,16 +18,25 @@
 			};
 			$(document).ready(function() {
 				if($("#regex-source").text().length > 0) {
-					reset();
-					recurseExpression();
-					$("#regex-description").html(expressionExplanation);
+					execExpert();
+					execHighlighter();
 				}
 				$("#regex-source").on("change keyup paste", function() {
-					reset();
-					recurseExpression();
-					$("#regex-description").html(expressionExplanation);
+					execExpert();
+					execHighlighter();
+				});
+				$("#regex-highlighter-example").on("change keyup paste", function() {
+					execHighlighter();
 				});
 			});
+			function execHighlighter() {
+				$("#regex-highlighter").html($("#regex-highlighter-example").val());
+			}
+			function execExpert(){
+				reset();
+				recurseExpression();
+				$("#regex-description").html(expressionExplanation);
+			}
 			function reset() {
 				expression = $("#regex-source").val();
 				expressionIndex = 0;
@@ -173,6 +182,12 @@
 		<section id="content">
 			<textarea rows="3" cols="120" id="regex-source">/[A-Z\.]+[a-z+(abc)?]*(abc){2}/g</textarea>
 			<div id="regex-description"></div>
+			<textarea rows="5" cols="120" id="regex-highlighter-example">Hello!
+123-456-7890
+@1ph@-Num3r!c</textarea>
+			<div id="regex-highlighter">
+			
+			</div>
 		</section>
 		<section id="footer">
 		
