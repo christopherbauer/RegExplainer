@@ -1,0 +1,131 @@
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script type="text/javascript">
+			var symbol = {
+				FrontSlash: '/',
+				BackSlash: '\\',
+				LParen: '(',
+				RParen: ')',
+				Dash: '-',
+				LBracket: '[',
+				RBracket: ']',
+				Plus: '+',
+				QuestionMark: '?',
+				Star: '*',
+				LCurled: '{',
+				RCurled: '}'
+			};
+			$(document).ready(function() {
+				$("#regex-source").on("change keyup paste", function() {
+					expression = $(this).val();
+					expressionIndex = 0;
+					expressionExplanation = "";
+					recurseExpression();
+					
+					$("#regex-description").html(expressionExplanation);
+				});
+			});
+			var expression;
+			var expressionIndex;
+			var expressionExplanation;
+			var currentSymbol;
+			function nextSymbol(){
+				if(expressionIndex == expression.length) {
+					return 0;
+				}
+				currentSymbol = expression[expressionIndex];
+				expressionIndex++;
+				return 1;
+			}
+			function recurseExpression(expression) {
+				nextSymbol(); //first symbol
+				expect(symbol.FrontSlash);
+				while(nextSymbol() && !accept(symbol.FrontSlash)) {
+					if(accept(symbol.LParen)){
+						startSubExpression();
+					}
+					else if(accept(symbol.RParen)){
+						endSubExpression();
+					}
+					else if(accept(symbol.LBracket)) {
+						startCharClass();
+					}
+					else if(accept(symbol.RBracket)) {
+						endCharClass();
+					} 
+					else if(accept(symbol.Dash)) {
+						expressionExplanation += ' through ';
+					}
+					else if(accept(symbol.Plus)) {
+						expressionExplanation += ' 1 or more times ';
+					}
+					else if(accept(symbol.QuestionMark)) {
+						expressionExplanation += ' 0 or 1 times ';
+					}
+					else if(accept(symbol.Star)) {
+						expressionExplanation += ' 0 or more times ';
+					}
+					else if(accept(symbol.LCurled)) {
+						expressionExplanation += ' Exactly ';
+					}
+					else if(accept(symbol.RCurled)) {
+						expressionExplanation += ' times ';
+					}
+					else {
+						expressionExplanation += ' ' + currentSymbol + ' ';
+					}
+				}
+			}
+			function expect(expectedSymbol) {
+				if(accept(expectedSymbol)) {
+					return 1;
+				}
+				throw new SymbolNotExpectedException(expectedSymbol);
+				return 0;
+			}
+			function accept(symbol) {
+				if(currentSymbol == symbol) {
+					return 1;
+				}
+				return 0;
+			}
+			function startSubExpression(symbol) {
+				expressionExplanation += '<span class="logicalGroup">(Logical Group: ';
+			}
+			function endSubExpression(symbol) {
+				expressionExplanation += ': End Group)</span>';
+			}
+			function startCharClass() {
+				expressionExplanation += '<span class="charSet">[Char Set: ';
+			}
+			function endCharClass() {
+				expressionExplanation += ' : End Set]</span>';
+			}
+			function SymbolNotExpectedException(expected) {
+				throw new Error("Expected '" + expected + "' but found '" + currentSymbol + "'");
+			}
+		</script>
+		<style type="text/css">
+			.logicalGroup {
+				background-color: cyan;
+			}
+			.charSet {
+				background-color: yellow;
+			}
+		</style>
+	</head>
+	<body>
+		<section id="head">
+			<h2>QuickEx</h2>
+			<em>An engine for describing regex as you type it!</em>
+		</section>
+		<section id="content">
+			<textarea rows="3" cols="120" id="regex-source">/[A-Z]+[a-z+(abc)?]*(abc){2}/g</textarea>
+			<div id="regex-description"></div>
+		</section>
+		<section id="footer">
+		
+		</section>
+	</body>
+</html>
