@@ -14,7 +14,8 @@
 				QuestionMark: '?',
 				Star: '*',
 				LCurled: '{',
-				RCurled: '}'
+				RCurled: '}',
+				Bar: '|'
 			};
 			$(document).ready(function() {
 				if($("#regex-source").text().length > 0) {
@@ -34,6 +35,7 @@
 				var regexMinusOptions = $("#regex-source").val();
 				regexMinusOptions = regexMinusOptions.substring(regexMinusOptions.indexOf('/')+1);
 				regexMinusOptions = regexMinusOptions.substring(0,regexMinusOptions.lastIndexOf('/'));
+				var regexp = new RegExp(regexMinusOptions);
 				var highlights = [];
 				for(var i = 0; i < lines.length; i++) {
 					highlights[i] = {};
@@ -63,6 +65,7 @@
 			var currentSymbol;
 			var escaping;
 			var wasChar;
+			var group = 0;
 			function nextSymbol(){
 				if(expressionIndex == expression.length) {
 					return 0;
@@ -128,6 +131,10 @@
 						expressionExplanation += ' times ';
 						wasChar = false;
 					}
+					else if(accept(symbol.Bar)) {
+						expressionExplanation += ' or ';
+						wasChar = false;
+					}
 					else {
 						addCurrentSymbol();
 					}
@@ -145,7 +152,10 @@
 				return 0;
 			}
 			function addCurrentSymbol() {
-				if(wasChar) {
+				if(group > 0 && wasChar) {
+					expressionExplanation += ' and ';
+				}
+				else if(wasChar) {
 					expressionExplanation += ' or ';
 				}
 				expressionExplanation += ' ' + currentSymbol + ' ';
@@ -165,10 +175,12 @@
 				return 0;
 			}
 			function startSubExpression(symbol) {
-				expressionExplanation += '<span class="logicalGroup">(Logical Group: ';
+				expressionExplanation += '<span class="logicalGroup">(Group: ';
+				group++;
 			}
 			function endSubExpression(symbol) {
 				expressionExplanation += ')</span>';
+				group--;
 			}
 			function startCharClass() {
 				expressionExplanation += '<span class="charSet">[Char Set: ';
