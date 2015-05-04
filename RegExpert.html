@@ -30,6 +30,8 @@
 			var expressionIndex;
 			var expressionExplanation;
 			var currentSymbol;
+			var escaping;
+			var wasChar;
 			function nextSymbol(){
 				if(expressionIndex == expression.length) {
 					return 0;
@@ -42,40 +44,70 @@
 				nextSymbol(); //first symbol
 				expect(symbol.FrontSlash);
 				while(nextSymbol() && !accept(symbol.FrontSlash)) {
-					if(accept(symbol.LParen)){
+					if(escaping){
+						escaping = false;
+						addCurrentSymbol();
+					}
+					else if(accept(symbol.BackSlash)) {
+						wasChar = false;
+						if(escaping === true) {
+							escaping = false;
+							addCurrentSymbol();
+						} else {
+							escaping = true;
+						}
+					}
+					else if(accept(symbol.LParen)){
 						startSubExpression();
+						wasChar = false;
 					}
 					else if(accept(symbol.RParen)){
 						endSubExpression();
+						wasChar = false;
 					}
 					else if(accept(symbol.LBracket)) {
 						startCharClass();
+						wasChar = false;
 					}
 					else if(accept(symbol.RBracket)) {
 						endCharClass();
+						wasChar = false;
 					} 
 					else if(accept(symbol.Dash)) {
 						expressionExplanation += ' through ';
+						wasChar = false;
 					}
 					else if(accept(symbol.Plus)) {
 						expressionExplanation += ' 1 or more times ';
+						wasChar = false;
 					}
 					else if(accept(symbol.QuestionMark)) {
 						expressionExplanation += ' 0 or 1 times ';
+						wasChar = false;
 					}
 					else if(accept(symbol.Star)) {
 						expressionExplanation += ' 0 or more times ';
+						wasChar = false;
 					}
 					else if(accept(symbol.LCurled)) {
 						expressionExplanation += ' Exactly ';
+						wasChar = false;
 					}
 					else if(accept(symbol.RCurled)) {
 						expressionExplanation += ' times ';
+						wasChar = false;
 					}
 					else {
-						expressionExplanation += ' ' + currentSymbol + ' ';
+						addCurrentSymbol();
 					}
 				}
+			}
+			function addCurrentSymbol() {
+				if(wasChar) {
+					expressionExplanation += ' or ';
+				}
+				expressionExplanation += ' ' + currentSymbol + ' ';
+				wasChar = true;
 			}
 			function expect(expectedSymbol) {
 				if(accept(expectedSymbol)) {
@@ -121,7 +153,7 @@
 			<em>An engine for describing regex as you type it!</em>
 		</section>
 		<section id="content">
-			<textarea rows="3" cols="120" id="regex-source">/[A-Z]+[a-z+(abc)?]*(abc){2}/g</textarea>
+			<textarea rows="3" cols="120" id="regex-source">/[A-Z\.]+[a-z+(abc)?]*(abc){2}/g</textarea>
 			<div id="regex-description"></div>
 		</section>
 		<section id="footer">
