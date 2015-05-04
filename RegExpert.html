@@ -30,7 +30,20 @@
 				});
 			});
 			function execHighlighter() {
-				$("#regex-highlighter").html($("#regex-highlighter-example").val());
+				var lines = $("#regex-highlighter-example").val().split('\n');
+				var regexp = new RegExp($("#regex-source").val());
+				var highlights = [];
+				for(var i = 0; i < lines.length; i++) {
+					highlights[i] = {};
+					highlights[i].Value = lines[i];
+					highlights[i].Status = regexp.test(lines[i]);
+				}
+				
+				var description = "";
+				for(var i = 0; i < highlights.length; i++) {
+					description += highlights[i].Value + " - ["+ highlights[i].Status +"]"
+				}
+				$("#regex-highlighter").text(description);
 			}
 			function execExpert(){
 				reset();
@@ -59,7 +72,7 @@
 			function recurseExpression(expression) {
 				nextSymbol(); //first symbol
 				expect(symbol.FrontSlash);
-				while(nextSymbol() && !accept(symbol.FrontSlash)) {
+				while(nextSymbol() && (escaping || !accept(symbol.FrontSlash))) {
 					if(escaping){
 						escaping = false;
 						addCurrentSymbol();
