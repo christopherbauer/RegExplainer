@@ -110,8 +110,12 @@
 						wasChar = false;
 					} 
 					else if(accept(symbol.Dash)) {
-						expressionExplanation += ' through ';
-						wasChar = false;
+						if(wasChar) {
+							expressionExplanation += ' through ';
+							wasChar = false;
+						} else {
+							addCurrentSymbol();
+						}
 					}
 					else if(accept(symbol.Plus)) {
 						expressionExplanation += ' 1 or more times ';
