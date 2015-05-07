@@ -1,6 +1,7 @@
 <html>
 	<head>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="Context.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var symbol = {
 				FrontSlash: '/',
@@ -67,6 +68,7 @@
 			var escaping;
 			var wasChar;
 			var group = 0;
+			var context = new Context();
 			function nextSymbol(){
 				if(expressionIndex == expression.length) {
 					return 0;
@@ -160,11 +162,13 @@
 				return 0;
 			}
 			function addCurrentSymbol() {
-				if(group > 0 && wasChar) {
-					expressionExplanation += ' and ';
-				}
-				else if(wasChar) {
-					expressionExplanation += ' or ';
+				if(wasChar) {
+					if(context.getContext() == contexts.ExplicitSet) {
+						expressionExplanation += ' or ';
+					}
+					else if(context.getContext() == contexts.LogicalSet) {
+						//Do nothing - should be just the characters in line
+					}
 				}
 				expressionExplanation += ' ' + currentSymbol + ' ';
 				wasChar = true;
@@ -184,17 +188,21 @@
 			}
 			function startSubExpression(symbol) {
 				expressionExplanation += '<span class="logicalGroup">(Group: ';
+				context.addContext(contexts.LogicalGroup);
 				group++;
 			}
 			function endSubExpression(symbol) {
 				expressionExplanation += ')</span>';
+				context.removeContext(contexts.LogicalGroup);
 				group--;
 			}
 			function startCharClass() {
 				expressionExplanation += '<span class="charSet">[Char Set: ';
+				context.addContext(contexts.ExplicitSet);
 			}
 			function endCharClass() {
 				expressionExplanation += ']</span>';
+				context.removeContext(contexts.ExplicitSet);
 			}
 			function SymbolNotExpectedException(expected) {
 				throw new Error("Expected '" + expected + "' but found '" + currentSymbol + "'");
@@ -215,11 +223,15 @@
 			<em>An engine for describing regex as you type it!</em>
 		</section>
 		<section id="content">
-			<textarea rows="3" cols="120" id="regex-source">/[A-Z\.]+[a-z+(abc)?]*(abc){2}/g</textarea>
+			<textarea rows="3" cols="120" id="regex-source">/(ST[AR]T)/g</textarea>
 			<div id="regex-description"></div>
 			<textarea rows="5" cols="120" id="regex-highlighter-example">Hello!
 123-456-7890
-@1ph@-Num3r!c</textarea>
+@1ph@-Num3r!c
+STRAT
+START
+STAT
+STRT</textarea>
 			<div id="regex-highlighter">
 			
 			</div>
