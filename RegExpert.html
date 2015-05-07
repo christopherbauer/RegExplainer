@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<script src="jquery-1.10.2.min.js"></script>
 		<script src="Context.js" type="text/javascript"></script>
 		<script type="text/javascript">
 			var symbol = {
@@ -30,6 +30,7 @@
 					execHighlighter();
 				});
 				$("#regex-highlighter-example").on("change keyup paste", function() {
+					execExpert();
 					execHighlighter();
 				});
 			});
@@ -45,11 +46,11 @@
 					highlights[i].Status = regexp.test(lines[i]);
 				}
 				
-				var description = "";
+				var descriptions = [];
 				for(var i = 0; i < highlights.length; i++) {
-					description += highlights[i].Value + " - ["+ highlights[i].Status +"]"
+					$("#regex-highlighter").append($("<br/>"));
+					$("#regex-highlighter").append($("<span>"+highlights[i].Value + " - ["+ highlights[i].Status +"]</span>"));
 				}
-				$("#regex-highlighter").text(description);
 			}
 			function execExpert(){
 				reset();
@@ -60,6 +61,7 @@
 				expression = $("#regex-source").val();
 				expressionIndex = 0;
 				expressionExplanation = "";
+				$("#regex-highlighter").empty();
 			}
 			var expression;
 			var expressionIndex;
