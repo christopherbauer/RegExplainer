@@ -183,7 +183,7 @@
 						//Do nothing - should be just the characters in line
 					}
 				}
-				expressionExplanation += ' ' + currentSymbol + ' ';
+				expressionExplanation += currentSymbol;
 				wasChar = true;
 			}
 			function expect(expectedSymbol) {
@@ -200,7 +200,7 @@
 				return 0;
 			}
 			function startSubExpression(symbol) {
-				expressionExplanation += '<span class="logicalGroup">(Group: ';
+				expressionExplanation += '<span class="logicalGroup">(';
 				context.addContext(contexts.LogicalGroup);
 				group++;
 			}
@@ -251,10 +251,10 @@
 			<em>An engine for describing regex as you type it!</em>
 		</section>
 		<section id="content">
-			<input type="text" value="/" class="regex-slash" disabled />
+			<input type="text" value="/" class="regex-slash" readonly />
 			<input id="regex-source" type="text" value="(ST[AR]T)|[13]" />
-			<input type="text" value="/" class="regex-slash" disabled />
-			<input type="text" value="g" id="regex-options" disabled />
+			<input type="text" value="/" class="regex-slash" readonly />
+			<input type="text" value="g" id="regex-options" readonly />
 			<div id="regex-description"></div>
 			<textarea rows="5" cols="120" id="regex-highlighter-example">Hello!
 123-456-7890
