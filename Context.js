@@ -13,7 +13,7 @@ function Context() {
 		return contextHistory[contextHistory.length-1];
 	}
 	this.is = function(expectedContext) {
-		return this.getContext() == expectedContext;
+		return this.getContext() === expectedContext;
 	}
 	this.addContext = function(context) {
 		contextHistory.push(context);
