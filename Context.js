@@ -2,7 +2,8 @@ var contexts = {
 	None : 'N',
 	LogicalGroup: 'L',
 	ExplicitSet: 'E',
-	ExplicitQuantifier: 'Q'
+	ExplicitQuantifier: 'Q',
+	CharacterClass: 'C'
 }
 function Context() {
 	var contextHistory = [];
