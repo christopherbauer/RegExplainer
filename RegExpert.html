@@ -21,11 +21,15 @@
 				Dollar: '$'
 			};
 			$(document).ready(function() {
-				if($("#regex-source").text().length > 0) {
+			
+				sizeSourceInputToTextWidth();
+			
+				if($("#regex-source").val().length > 0) {
 					execExpert();
 					execHighlighter();
 				}
 				$("#regex-source").on("change keyup paste", function() {
+					sizeSourceInputToTextWidth();
 					execExpert();
 					execHighlighter();
 				});
@@ -34,10 +38,13 @@
 					execHighlighter();
 				});
 			});
+			function sizeSourceInputToTextWidth() {
+				$("#regex-source").attr("size", $("#regex-source").val().length);
+			}
 			function execHighlighter() {
+				
 				var lines = $("#regex-highlighter-example").val().split('\n');
-				var regexMinusOptions = $("#regex-source").val();
-				regexMinusOptions = regexMinusOptions.substring(regexMinusOptions.indexOf('/')+1,regexMinusOptions.lastIndexOf('/'));
+				var regexMinusOptions = expression.substring(expression.indexOf('/')+1,expression.lastIndexOf('/'));
 				var regexp = new RegExp(regexMinusOptions);
 				var highlights = [];
 				for(var i = 0; i < lines.length; i++) {
@@ -49,7 +56,7 @@
 				var descriptions = [];
 				for(var i = 0; i < highlights.length; i++) {
 					$("#regex-highlighter").append($("<br/>"));
-					$("#regex-highlighter").append($("<span>"+highlights[i].Value + " - ["+ highlights[i].Status +"]</span>"));
+					$("#regex-highlighter").append($("<span regex-status=\""+highlights[i].Status+"\">"+highlights[i].Value + " - ["+ highlights[i].Status +"]</span>"));
 				}
 			}
 			function execExpert(){
@@ -58,7 +65,7 @@
 				$("#regex-description").html(expressionExplanation);
 			}
 			function reset() {
-				expression = $("#regex-source").val();
+				expression = '/'+$("#regex-source").val()+'/'+$("#regex-options").val();
 				expressionIndex = 0;
 				expressionExplanation = "";
 				$("#regex-highlighter").empty();
@@ -79,7 +86,7 @@
 				expressionIndex++;
 				return 1;
 			}
-			function recurseExpression(expression) {
+			function recurseExpression() {
 				nextSymbol(); //first symbol
 				expect(symbol.FrontSlash);
 				while(nextSymbol() && (escaping || !accept(symbol.FrontSlash))) {
@@ -221,6 +228,21 @@
 			.charSet {
 				background-color: yellow;
 			}
+			.regex-slash, #regex-options {
+				display: inline;
+				width: 15px;
+				border: none;
+				background: none;
+			}
+			#regex-source {
+				display: inline-block;
+			}
+			[regex-status=false] {
+				color: red;
+			}
+			[regex-status=true] {
+				color: green;
+			}
 		</style>
 	</head>
 	<body>
@@ -229,7 +251,10 @@
 			<em>An engine for describing regex as you type it!</em>
 		</section>
 		<section id="content">
-			<textarea rows="3" cols="120" id="regex-source">/(ST[AR]T)/g</textarea>
+			<input type="text" value="/" class="regex-slash" disabled />
+			<input id="regex-source" type="text" value="(ST[AR]T)|[13]" />
+			<input type="text" value="/" class="regex-slash" disabled />
+			<input type="text" value="g" id="regex-options" disabled />
 			<div id="regex-description"></div>
 			<textarea rows="5" cols="120" id="regex-highlighter-example">Hello!
 123-456-7890
