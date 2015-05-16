@@ -192,12 +192,24 @@
 							expressionExplanation += ' Any character not '
 						}
 						else {
-							expressionExplanation += ' Starting with ';
+							var dollarPosition = ever(symbol.Dollar);
+							if(dollarPosition == -1) {
+								expressionExplanation += ' Starting with ';
+							}
+							else if(dollarPosition > expressionIndex) {
+								expressionExplanation += 'Only ';
+							} else {
+								alwaysMatchFailure = true;
+								expressionExplanation += 'Error detected';
+							}
+							
 						}
 						wasChat = false;
 					}
 					else if(accept(symbol.Dollar)) {
-						expressionExplanation += ' Ending with preceding ';
+						if(ever(symbol.Caret) == -1) {
+							expressionExplanation = 'Ending with ' + expressionExplanation;	
+						}
 					} else if(accept(symbol.Period)) {
 						expressionExplanation += ' any character except <span>\\n</span> '; //explain newline
 					}
@@ -207,9 +219,17 @@
 				}
 				while(nextSymbol()) {
 					if(accept('g')) {
-						expressionExplanation += ' globally ';
+						expressionExplanation += ' globally ';	
 					}
 				}
+			}
+			function ever(expectedSymbol) {
+				for(var i = 0; i < expression.length; ++i){
+					if(expression[i] == expectedSymbol) {
+						return i;
+					}
+				}
+				return -1;
 			}
 			function lookahead(expectedSymbol) {
 				if(expressionIndex < expression.length && expression[expressionIndex] == expectedSymbol) {
@@ -265,6 +285,9 @@
 			}
 		</script>
 		<style type="text/css">
+			html {
+				font-family: Lucida Console;		
+			}
 			input[readonly] {
 				color: white;
 			}
@@ -304,6 +327,8 @@
 				border: 2px dashed pink;
 				padding: 3px;
 				text-align: center;
+				whitespace: pre-wrap;
+				word-wrap: break-word;
 			}
 			.regex-inputs * {
 				margin: 0 0 15px 0;
@@ -317,7 +342,7 @@
     <header>
       <div class="container">
         <h1>RegExplainer</h1>
-        <h2>Open source single page application that will try to decribe a regex written on the site or pasted in from mysterious source code.</h2>
+        <h2>Open source single page application that will try to describe a regex written on the site or pasted in from mysterious source code.</h2>
 
         <section id="downloads">
           <a href="https://github.com/christopherbauer/RegExplainer/zipball/master" class="btn">Download as .zip</a>
