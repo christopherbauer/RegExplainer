@@ -1,8 +1,18 @@
+<!DOCTYPE html>
 <html>
-	<head>
-		<script src="jquery-1.10.2.min.js"></script>
-		<script src="Context.js" type="text/javascript"></script>
-		<script type="text/javascript">
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>RegExplainer by christopherbauer</title>
+	
+	<script src="scripts/jquery-1.10.2.min.js"></script>
+	<script src="scripts/Context.js" type="text/javascript"></script>
+	<script type="text/javascript">
 			var symbol = {
 				FrontSlash: '/',
 				BackSlash: '\\',
@@ -243,7 +253,7 @@
 				group--;
 			}
 			function startCharClass() {
-				expressionExplanation += '<span class="charSet">[Char Set: ';
+				expressionExplanation += '<span class="charSet">[';
 				context.addContext(contexts.ExplicitSet);
 			}
 			function endCharClass() {
@@ -255,6 +265,9 @@
 			}
 		</script>
 		<style type="text/css">
+			input[readonly] {
+				color: white;
+			}
 			.logicalGroup {
 				background-color: cyan;
 			}
@@ -276,32 +289,72 @@
 			[regex-status=true] {
 				color: green;
 			}
+			.container {
+				display: block;
+			}
+			#regex-highlighter-example{
+				display: block;
+				width: 98%;
+				padding: 1%;
+			}
+			#regex-description {
+				display: block;
+				color: black;
+				background-color: white;
+				border: 2px dashed pink;
+				padding: 3px;
+				text-align: center;
+			}
+			.regex-inputs * {
+				margin: 0 0 15px 0;
+				font-size: 2em;
+			}
 		</style>
-	</head>
-	<body>
-		<section id="head">
-			<h2>RegExplainer</h2>
-			<em>An engine for describing regex as you type it!</em>
-		</section>
-		<section id="content">
-			<input type="text" value="/" class="regex-slash" readonly />
-			<input id="regex-source" type="text" value="(ST[AR]T)|[13]" />
-			<input type="text" value="/" class="regex-slash" readonly />
-			<input type="text" value="g" id="regex-options" readonly />
-			<div id="regex-description"></div>
-			<textarea rows="5" cols="120" id="regex-highlighter-example">Hello!
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>RegExplainer</h1>
+        <h2>Open source single page application that will try to decribe a regex written on the site or pasted in from mysterious source code.</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/christopherbauer/RegExplainer/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/christopherbauer/RegExplainer/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/christopherbauer/RegExplainer" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+		<section id="main_content">
+			<div class="regex-inputs">
+				<input type="text" value="/" class="regex-slash" readonly />
+				<input id="regex-source" type="text" value="(ST[AR]T)|[13]" />
+				<input type="text" value="/" class="regex-slash" readonly />
+				<input type="text" value="g" id="regex-options" readonly />
+			</div>
+			<div class="container">
+				<div id="regex-description"></div>
+				<textarea rows="5" id="regex-highlighter-example">Hello!
 123-456-7890
 @1ph@-Num3r!c
 STRAT
 START
 STAT
 STRT</textarea>
-			<div id="regex-highlighter">
-			
 			</div>
+			<div id="regex-highlighter">
+
+			</div>
+
 		</section>
+
 		<section id="footer">
 		
-		</section>
-	</body>
+		</section>		
+    </div>
+  </body>
 </html>
+		
