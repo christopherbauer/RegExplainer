@@ -72,12 +72,12 @@
 			function execExpert(){
 				reset();
 				recurseExpression();
-				$("#regex-description").html(expressionExplanation);
+				$("#regex-description").html(expressionExplanation.join(''));
 			}
 			function reset() {
 				expression = '/'+$("#regex-source").val()+'/'+$("#regex-options").val();
 				expressionIndex = 0;
-				expressionExplanation = "";
+				expressionExplanation = [];
 				$("#regex-highlighter").empty();
 			}
 			var expression;
@@ -86,7 +86,6 @@
 			var currentSymbol;
 			var escaping;
 			var wasChar;
-			var group = 0;
 			var context = new Context();
 			function nextSymbol(){
 				if(expressionIndex == expression.length) {
@@ -106,22 +105,22 @@
 					}
 					else if(context.is(contexts.CharacterClass)) {
 						if(accept('W')) {
-							expressionExplanation += ' <span>non-word</span> '; //plan something to explain what 'non-word' is; shorthand for [^a-zA-Z_0-9]
+							expressionExplanation.push(' <span>non-word</span> '); //plan something to explain what 'non-word' is; shorthand for [^a-zA-Z_0-9]
 						}
 						else if(accept('W')) {
-							expressionExplanation += ' <span>word</span> '; //plan something to explain what 'word' is; shorthand for [a-zA-Z_0-9]
+							expressionExplanation.push(' <span>word</span> '); //plan something to explain what 'word' is; shorthand for [a-zA-Z_0-9]
 						}
 						else if(accept('s')) {
-							expressionExplanation += ' <span>whitespace</span> '; //plan something to explain what 'whitespace' is; shorthand for [ \f\n\r\t\v]
+							expressionExplanation.push(' <span>whitespace</span> '); //plan something to explain what 'whitespace' is; shorthand for [ \f\n\r\t\v]
 						}
 						else if(accept('S')) {
-							expressionExplanation += ' <span>non-whitespace</span> '; //plan something to explain what 'non-whitespace' is; shorthand for [ ^\f\n\r\t\v]
+							expressionExplanation.push(' <span>non-whitespace</span> '); //plan something to explain what 'non-whitespace' is; shorthand for [ ^\f\n\r\t\v]
 						} 
 						else if(accept('d')) {
-							expressionExplanation += ' <span>any decimal digit</span> '; //plan something to explain; Equivalent to \p{Nd} for Unicode and [0-9] for non-Unicode
+							expressionExplanation.push(' <span>any decimal digit</span> '); //plan something to explain; Equivalent to \p{Nd} for Unicode and [0-9] for non-Unicode
 						}
 						else if(accept('D')) {
-							expressionExplanation += ' <span>any non-digit</span> '; //plan something to explain; Equivalent to \P{Nd} for Unicode and [^0-9] for non-Unicode
+							expressionExplanation.push(' <span>any non-digit</span> '); //plan something to explain; Equivalent to \P{Nd} for Unicode and [^0-9] for non-Unicode
 						}
 						context.removeContext(contexts.CharacterClass);
 					}
@@ -156,62 +155,62 @@
 					} 
 					else if(accept(symbol.Dash)) {
 						if(wasChar) {
-							expressionExplanation += ' through ';
+							expressionExplanation.push(' through ');
 							wasChar = false;
 						} else {
 							addCurrentSymbol();
 						}
 					}
 					else if(accept(symbol.Plus)) {
-						expressionExplanation += ' 1 or more times ';
+						expressionExplanation.push(' 1 or more times ');
 						wasChar = false;
 					}
 					else if(accept(symbol.QuestionMark)) {
 						//future - lookahead for negative lookbehind assertion
-						expressionExplanation += ' 0 or 1 times ';
+						expressionExplanation.push(' 0 or 1 times ');
 						wasChar = false;
 					}
 					else if(accept(symbol.Star)) {
-						expressionExplanation += ' 0 or more times ';
+						expressionExplanation.push(' 0 or more times ');
 						wasChar = false;
 					}
 					else if(accept(symbol.LCurled)) {
-						expressionExplanation += ' Exactly ';
+						expressionExplanation.push(' Exactly ');
 						wasChar = false;
 					}
 					else if(accept(symbol.RCurled)) {
-						expressionExplanation += ' times ';
+						expressionExplanation.push(' times ');
 						wasChar = false;
 					}
 					else if(accept(symbol.Bar)) {
-						expressionExplanation += ' or ';
+						expressionExplanation.push(' or ');
 						wasChar = false;
 					}
 					else if(accept(symbol.Caret)) {
 						if(context.is(contexts.ExplicitSet)) {
-							expressionExplanation += ' Any character not '
+							expressionExplanation.push(' Any character not ');
 						}
 						else {
 							var dollarPosition = ever(symbol.Dollar);
 							if(dollarPosition == -1) {
-								expressionExplanation += ' Starting with ';
+								expressionExplanation.push(' Starting with ');
 							}
 							else if(dollarPosition > expressionIndex) {
-								expressionExplanation += 'Only ';
+								expressionExplanation.push('Only ');
 							} else {
 								alwaysMatchFailure = true;
-								expressionExplanation += 'Error detected';
+								expressionExplanation.push('Error detected');
 							}
 							
 						}
-						wasChat = false;
+						wasChar = false;
 					}
 					else if(accept(symbol.Dollar)) {
 						if(ever(symbol.Caret) == -1) {
-							expressionExplanation = 'Ending with ' + expressionExplanation;	
+							expressionExplanation.unshift('Ending with ' + expressionExplanation);
 						}
 					} else if(accept(symbol.Period)) {
-						expressionExplanation += ' any character except <span>\\n</span> '; //explain newline
+						expressionExplanation.push(' any character except <span>\\n</span> '); //explain newline
 					}
 					else {
 						addCurrentSymbol();
@@ -219,7 +218,7 @@
 				}
 				while(nextSymbol()) {
 					if(accept('g')) {
-						expressionExplanation += ' globally ';	
+						expressionExplanation.push(' globally ');	
 					}
 				}
 			}
@@ -240,13 +239,13 @@
 			function addCurrentSymbol() {
 				if(wasChar) {
 					if(context.is(contexts.ExplicitSet)) {
-						expressionExplanation += ' or ';
+						expressionExplanation.push(' or ');
 					}
 					else if(context.is(contexts.LogicalSet)) {
 						//Do nothing - should be just the characters in line
 					}
 				}
-				expressionExplanation += currentSymbol;
+				expressionExplanation.push(currentSymbol);
 				wasChar = true;
 			}
 			function expect(expectedSymbol) {
@@ -263,21 +262,19 @@
 				return 0;
 			}
 			function startSubExpression(symbol) {
-				expressionExplanation += '<span class="logicalGroup">(';
+				expressionExplanation.push('<span class="logicalGroup">(');
 				context.addContext(contexts.LogicalGroup);
-				group++;
 			}
 			function endSubExpression(symbol) {
-				expressionExplanation += ')</span>';
+				expressionExplanation.push(')</span>');
 				context.removeContext(contexts.LogicalGroup);
-				group--;
 			}
 			function startCharClass() {
-				expressionExplanation += '<span class="charSet">[';
+				expressionExplanation.push('<span class="charSet">[');
 				context.addContext(contexts.ExplicitSet);
 			}
 			function endCharClass() {
-				expressionExplanation += ']</span>';
+				expressionExplanation.push(']</span>');
 				context.removeContext(contexts.ExplicitSet);
 			}
 			function SymbolNotExpectedException(expected) {
