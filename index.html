@@ -193,13 +193,20 @@
 						else {
 							var dollarPosition = ever(symbol.Dollar);
 							if(dollarPosition == -1) {
-								expressionExplanation.push(' Starting with ');
+								expressionExplanation.push('Starting with ');
 							}
-							else if(dollarPosition > expressionIndex) {
-								expressionExplanation.push('Only ');
-							} else {
-								alwaysMatchFailure = true;
-								expressionExplanation.push('Error detected');
+							else 
+							{
+								if(dollarPosition > expressionIndex) {
+									if(ever(symbol.Bar) > -1) {
+										expressionExplanation.push('Starting with ');
+									} else {
+										expressionExplanation.push('Only ');
+									}
+								} else {
+									alwaysMatchFailure = true;
+									expressionExplanation.push('Error detected');
+								}
 							}
 							
 						}
@@ -207,7 +214,19 @@
 					}
 					else if(accept(symbol.Dollar)) {
 						if(ever(symbol.Caret) == -1) {
-							expressionExplanation.unshift('Ending with ' + expressionExplanation);
+							var lastParen = lookBehind(symbol.LParen);
+							var lastBracket = lookBehind(symbol.LBracket);
+							if(lastParen > -1 || lastBracket > -1) {
+								expressionExplanation.splice(Math.max(lastParen, lastBracket), 0, 'Ending with ');
+							}
+						} else {
+							if(ever(symbol.Bar) > -1) {
+								var lastParen = lookBehind(symbol.LParen);
+								var lastBracket = lookBehind(symbol.LBracket);
+								if(lastParen > -1 || lastBracket > -1) {
+									expressionExplanation.splice(Math.max(lastParen, lastBracket), 0, 'Ending with ');
+								}
+							}
 						}
 					} else if(accept(symbol.Period)) {
 						expressionExplanation.push(' any character except <span>\\n</span> '); //explain newline
@@ -224,6 +243,14 @@
 			}
 			function ever(expectedSymbol) {
 				for(var i = 0; i < expression.length; ++i){
+					if(expression[i] == expectedSymbol) {
+						return i;
+					}
+				}
+				return -1;
+			}
+			function lookBehind(expectedSymbol) {
+				for(var i = expressionIndex; i > -1; i--) {
 					if(expression[i] == expectedSymbol) {
 						return i;
 					}
