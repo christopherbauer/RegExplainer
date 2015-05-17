@@ -105,22 +105,22 @@
 					}
 					else if(context.is(contexts.CharacterClass)) {
 						if(accept('W')) {
-							expressionExplanation.push(' <span>non-word</span> '); //plan something to explain what 'non-word' is; shorthand for [^a-zA-Z_0-9]
+							expressionExplanation.push(' <span title="NOT a-z or A-Z or 0-9">non-word</span> '); //plan something to explain what 'non-word' is; shorthand for [^a-zA-Z_0-9]
 						}
-						else if(accept('W')) {
-							expressionExplanation.push(' <span>word</span> '); //plan something to explain what 'word' is; shorthand for [a-zA-Z_0-9]
+						else if(accept('w')) {
+							expressionExplanation.push(' <span title="a-Z or A-Z or 0-9">word</span> '); //plan something to explain what 'word' is; shorthand for [a-zA-Z_0-9]
 						}
 						else if(accept('s')) {
-							expressionExplanation.push(' <span>whitespace</span> '); //plan something to explain what 'whitespace' is; shorthand for [ \f\n\r\t\v]
+							expressionExplanation.push(' <span title="Space or Tab or New Line or Carriage Return">whitespace</span> '); //plan something to explain what 'whitespace' is; shorthand for [ \f\n\r\t\v]
 						}
 						else if(accept('S')) {
-							expressionExplanation.push(' <span>non-whitespace</span> '); //plan something to explain what 'non-whitespace' is; shorthand for [ ^\f\n\r\t\v]
+							expressionExplanation.push(' <span title="NOT Space or Tab or New Line or Carriage Return">non-whitespace</span> '); //plan something to explain what 'non-whitespace' is; shorthand for [ ^\f\n\r\t\v]
 						} 
 						else if(accept('d')) {
-							expressionExplanation.push(' <span>any decimal digit</span> '); //plan something to explain; Equivalent to \p{Nd} for Unicode and [0-9] for non-Unicode
+							expressionExplanation.push(' <span title="0-9">any decimal digit</span> '); //plan something to explain; Equivalent to \p{Nd} for Unicode and [0-9] for non-Unicode
 						}
 						else if(accept('D')) {
-							expressionExplanation.push(' <span>any non-digit</span> '); //plan something to explain; Equivalent to \P{Nd} for Unicode and [^0-9] for non-Unicode
+							expressionExplanation.push(' <span title="NOT 0-9">any non-digit</span> '); //plan something to explain; Equivalent to \P{Nd} for Unicode and [^0-9] for non-Unicode
 						}
 						context.removeContext(contexts.CharacterClass);
 					}
@@ -360,6 +360,10 @@
 			.regex-inputs * {
 				margin: 0 0 15px 0;
 				font-size: 2em;
+			}
+			[title] {
+				cursor: help;
+				color: brown;
 			}
 		</style>
   </head>
