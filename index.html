@@ -68,7 +68,7 @@
 				var descriptions = [];
 				for(var i = 0; i < highlights.length; i++) {
 					$("#regex-highlighter").append($("<br/>"));
-					$("#regex-highlighter").append($("<span regex-status=\""+highlights[i].Status+"\">"+highlights[i].Value + " - ["+ highlights[i].Status +"]</span>"));
+					$("#regex-highlighter").append($("<span regex-status=\""+highlights[i].Status+"\">"+highlights[i].Value + " ["+ highlights[i].Status +"]</span>"));
 				}
 			}
 			function execExpert(){
@@ -174,7 +174,10 @@
 						wasChar = false;
 					}
 					else if(accept(symbol.Dash)) {
-						if(wasChar) {
+						if(
+							(previousCharacterMatches(/\d/) && nextCharacterMatches(/\d/))
+							|| (previousCharacterMatches(/\w/) && nextCharacterMatches(/\w/))
+							) {
 							expressionExplanation.push(' through ');
 							wasChar = false;
 						} else {
@@ -278,6 +281,14 @@
 					}
 				}
 				return -1;
+			}
+			function previousCharacterMatches(pattern) {
+				var regexp = new RegExp(pattern);
+				return regexp.test(expression[expressionIndex-2]);
+			}
+			function nextCharacterMatches(pattern) {
+				var regexp = new RegExp(pattern);
+				return regexp.test(expression[expressionIndex]);
 			}
 			function wasPreviousChar(expectedSymbol) {
 				return expression[expressionIndex-2] == expectedSymbol;
