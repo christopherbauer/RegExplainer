@@ -30,7 +30,8 @@
 				Caret: '^',
 				Dollar: '$',
 				Period: '.',
-				Comma: ','
+				Comma: ',',
+				Equal: '='
 			};
 			$(document).ready(function() {
 			
@@ -96,7 +97,6 @@
 			var escaping;
 			var wasChar;
 			var context = new Context();
-			var valid = true;
 			var notifications = [];
 			function nextSymbol(){
 				if(expressionIndex == expression.length) {
@@ -110,7 +110,7 @@
 				notifications = [];
 				nextSymbol(); //first symbol
 				expect(symbol.FrontSlash);
-				while(valid && nextSymbol() && (escaping || !accept(symbol.FrontSlash))) {
+				while(nextSymbol() && (escaping || !accept(symbol.FrontSlash))) {
 					if(escaping){
 						escaping = false;
 						addCurrentSymbol();
@@ -182,8 +182,12 @@
 						}
 					}
 					else if(accept(symbol.Plus)) {
-						expressionExplanation.push(' 1 or more times ');
-						wasChar = false;
+						if(context.is(contexts.ExplicitSet)) {
+							addCurrentSymbol();
+						} else {
+							expressionExplanation.push(' 1 or more times ');
+							wasChar = false;
+						}
 					}
 					else if(accept(symbol.QuestionMark)) {
 						//future - lookahead for negative lookbehind assertion
@@ -244,7 +248,7 @@
 						expressionExplanation.push(' any character except <span>\\n</span> '); //explain newline
 					} else if(accept(symbol.Comma)) {
 						if(context.is(contexts.Range)) {
-							if(wasLastChar(symbol.LCurled)) {
+							if(wasPreviousChar(symbol.LCurled)) {
 								notify('Expression was found to have invalid definition at character "," (~ <span class="notification-expression">' + expression[expressionIndex-3] + expression[expressionIndex-2] +expression[expressionIndex-1] + '</span>)');
 							}
 							else if(!lookahead(symbol.RCurled)) {
@@ -256,7 +260,7 @@
 						} else {
 							addCurrentSymbol();
 						}
-					}
+					}	
 					else {
 						addCurrentSymbol();
 					}
@@ -275,8 +279,11 @@
 				}
 				return -1;
 			}
-			function wasLastChar(expectedSymbol) {
+			function wasPreviousChar(expectedSymbol) {
 				return expression[expressionIndex-2] == expectedSymbol;
+			}
+			function isNextChar(expectedSymbol) {
+				return expression[expressionIndex] == expectedSymbol;
 			}
 			function lookBehind(expectedSymbol) {
 				for(var i = expressionIndex; i > -1; i--) {
