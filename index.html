@@ -74,6 +74,14 @@
 				reset();
 				recurseExpression();
 				$("#regex-description").html(expressionExplanation.join(''));
+				$("#regex-notifications").html(listify(notifications));
+			}
+			function listify(listTerms) {
+				var $list = $("<ul></ul>");
+				for(var i = 0; i < listTerms.length; i++){
+					$list.append($("<li>" + listTerms[i] + "</li>"));
+				}
+				return $list;
 			}
 			function reset() {
 				expression = '/'+$("#regex-source").val()+'/'+$("#regex-options").val();
@@ -88,6 +96,8 @@
 			var escaping;
 			var wasChar;
 			var context = new Context();
+			var valid = true;
+			var notifications = [];
 			function nextSymbol(){
 				if(expressionIndex == expression.length) {
 					return 0;
@@ -97,9 +107,10 @@
 				return 1;
 			}
 			function recurseExpression() {
+				notifications = [];
 				nextSymbol(); //first symbol
 				expect(symbol.FrontSlash);
-				while(nextSymbol() && (escaping || !accept(symbol.FrontSlash))) {
+				while(valid && nextSymbol() && (escaping || !accept(symbol.FrontSlash))) {
 					if(escaping){
 						escaping = false;
 						addCurrentSymbol();
@@ -233,7 +244,10 @@
 						expressionExplanation.push(' any character except <span>\\n</span> '); //explain newline
 					} else if(accept(symbol.Comma)) {
 						if(context.is(contexts.Range)) {
-							if(!lookahead(symbol.RCurled)) {
+							if(wasLastChar(symbol.LCurled)) {
+								notify('Expression was found to have invalid definition at character "," (~ <span class="notification-expression">' + expression[expressionIndex-3] + expression[expressionIndex-2] +expression[expressionIndex-1] + '</span>)');
+							}
+							else if(!lookahead(symbol.RCurled)) {
 								expressionExplanation.push(" through ");
 							}
 							else {
@@ -261,6 +275,9 @@
 				}
 				return -1;
 			}
+			function wasLastChar(expectedSymbol) {
+				return expression[expressionIndex-2] == expectedSymbol;
+			}
 			function lookBehind(expectedSymbol) {
 				for(var i = expressionIndex; i > -1; i--) {
 					if(expression[i] == expectedSymbol) {
@@ -286,6 +303,9 @@
 				}
 				expressionExplanation.push(currentSymbol);
 				wasChar = true;
+			}
+			function notify(text) {
+				notifications.push(text);
 			}
 			function expect(expectedSymbol) {
 				if(accept(expectedSymbol)) {
@@ -366,13 +386,15 @@
 			}
 			#regex-description {
 				display: block;
+				text-align: center;
+				whitespace: pre-wrap;
+				word-wrap: break-word;
+			}
+			#regex-description, .notification-expression {
 				color: black;
 				background-color: white;
 				border: 2px dashed pink;
 				padding: 3px;
-				text-align: center;
-				whitespace: pre-wrap;
-				word-wrap: break-word;
 			}
 			.regex-inputs {
 				text-align: center;
@@ -412,6 +434,7 @@
 				<input type="text" value="g" id="regex-options" readonly />
 			</div>
 			<div class="container">
+				<div id="regex-notifications"></div>
 				<div id="regex-description"></div>
 				<textarea rows="5" id="regex-highlighter-example">Hello!
 123-456-7890
