@@ -30,6 +30,7 @@
 				Caret: '^',
 				Dollar: '$',
 				Period: '.',
+				Comma: ','
 			};
 			$(document).ready(function() {
 			
@@ -153,6 +154,14 @@
 						endCharClass();
 						wasChar = false;
 					} 
+					else if(accept(symbol.LCurled)) {
+						startRange();
+						wasChar = false;
+					}
+					else if(accept(symbol.RCurled)) {
+						endRange();
+						wasChar = false;
+					}
 					else if(accept(symbol.Dash)) {
 						if(wasChar) {
 							expressionExplanation.push(' through ');
@@ -172,14 +181,6 @@
 					}
 					else if(accept(symbol.Star)) {
 						expressionExplanation.push(' 0 or more times ');
-						wasChar = false;
-					}
-					else if(accept(symbol.LCurled)) {
-						expressionExplanation.push(' Exactly ');
-						wasChar = false;
-					}
-					else if(accept(symbol.RCurled)) {
-						expressionExplanation.push(' times ');
 						wasChar = false;
 					}
 					else if(accept(symbol.Bar)) {
@@ -230,6 +231,17 @@
 						}
 					} else if(accept(symbol.Period)) {
 						expressionExplanation.push(' any character except <span>\\n</span> '); //explain newline
+					} else if(accept(symbol.Comma)) {
+						if(context.is(contexts.Range)) {
+							if(!lookahead(symbol.RCurled)) {
+								expressionExplanation.push(" through ");
+							}
+							else {
+								expressionExplanation.push(" or more ");
+							}
+						} else {
+							addCurrentSymbol();
+						}
 					}
 					else {
 						addCurrentSymbol();
@@ -288,11 +300,19 @@
 				}
 				return 0;
 			}
-			function startSubExpression(symbol) {
+			function startRange() {
+				expressionExplanation.push('<span class="rangeGroup">{ Exactly ');
+				context.addContext(contexts.Range);
+			}
+			function endRange() {
+				expressionExplanation.push(' times }</span>');
+				context.removeContext(contexts.Range);
+			}
+			function startSubExpression() {
 				expressionExplanation.push('<span class="logicalGroup">(');
 				context.addContext(contexts.LogicalGroup);
 			}
-			function endSubExpression(symbol) {
+			function endSubExpression() {
 				expressionExplanation.push(')</span>');
 				context.removeContext(contexts.LogicalGroup);
 			}
